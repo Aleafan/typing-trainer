@@ -5,15 +5,21 @@ const defaultText = 'Однажды весною, в час небывало ж�
 
 function Trainer() {
   const [current, setCurrent] = useState(0);
-
+  
   useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key.length !== 1) return; // проверка, что клавиша "символьная"
+      setCurrent(c => {
+        if (e.key === defaultText[c]) return c + 1;
+        else {
+          document.getElementById(`${c}`).classList.add('error');
+          return c;
+        }
+      });
+    }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
-  
-  function handleKeyDown(e) {
-    setCurrent(current => current + 1);
-  }
 
   useEffect(() => {
     const currSymbol = document.getElementById(`${current}`);
