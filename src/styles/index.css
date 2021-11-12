@@ -8,30 +8,55 @@ html {
   height: 100%;
 }
 
-#root {
-  max-width: 700px;
-  margin: 5rem auto;
-}
-
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  min-height: 100%;
+  background: #f9f9f9;
+  font-family: 'Roboto Slab', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+header {
+  font-family: 'Press Start 2P', cursive;
+  background: #393E46;
+  padding: 1.5rem 0;
+}
+
+h1 {
+  font-size: 1.6rem;
+  word-spacing: -0.8rem;
+  margin: 0;
+  color: whitesmoke;
+  text-align: center;
+}
+
+h1 svg {
+  margin-right: 1rem;
+  vertical-align: text-bottom!important;
+}
+
+main {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
 .current {
   color: white;
-  background-color: green;
+  background-color: black;
   padding: 3px 2px 2px;
   border-radius: 3px;
 }
 
+.cursor-blink .current {
+  color: #393E46;
+  background-color: transparent;
+}
+
 .complete {
-  color: green;
+  color: grey;
 }
 
 .current.error {
-  background-color: rgb(219, 3, 3);
+  color: white;
+  background-color: rgb(202, 4, 4);
 }
