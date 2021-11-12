@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Text from './Text';
 import BtnRestart from './BtnRestart';
 import Speed from './Speed';
+import Precision from './Precision';
 
 const defaultText = 'Однажды весною, в час небывало жаркого заката, в Москве, на Патриарших прудах, появились два гражданина. Первый из них, одетый в летнюю серенькую пару, был маленького роста, упитан, лыс, свою приличную шляпу пирожком нес в руке, а на хорошо выбритом лице его помещались сверхъестественных размеров очки в черной роговой оправе. Второй – плечистый, рыжеватый, вихрастый молодой человек в заломленной на затылок клетчатой кепке – был в ковбойке, жеваных белых брюках и в черных тапочках.';
 
 function Trainer() {
   const [current, setCurrent] = useState(0);
+  const [errors, setErrors] = useState(0);
   const [text, setText] = useState('');
 
   /*
@@ -36,6 +38,7 @@ function Trainer() {
     setText('');
     setStart(false);
     setCurrent(0);
+    setErrors(0);
     fetchText();
     btnRestart.current.blur();
   }
@@ -51,6 +54,7 @@ function Trainer() {
         if (e.key === text[c]) {
           return c + 1;
         } else {
+          setErrors(e => e + 1);
           document.getElementById(`${c}`).classList.add('error');
           return c;
         }
@@ -94,6 +98,7 @@ function Trainer() {
   return (
     <main>
       <Speed speed={speed} />
+      <Precision current={current} errors={errors} />
       <Text text={text} />
       <BtnRestart ref={btnRestart} handleRestart={handleRestart} />
     </main>
