@@ -1,7 +1,13 @@
+import React from 'react';
+import Trainer from './components/Trainer';
+import Header from './components/Header';
+
 function App() {
   return (
-    <div>
-    </div>
+    <React.Fragment>
+      <Header />
+      <Trainer />
+    </React.Fragment>
   );
 }
 
