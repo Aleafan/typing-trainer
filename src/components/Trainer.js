@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Text from './Text';
 import BtnRestart from './BtnRestart';
+import Speed from './Speed';
 
 const defaultText = 'Однажды весною, в час небывало жаркого заката, в Москве, на Патриарших прудах, появились два гражданина. Первый из них, одетый в летнюю серенькую пару, был маленького роста, упитан, лыс, свою приличную шляпу пирожком нес в руке, а на хорошо выбритом лице его помещались сверхъестественных размеров очки в черной роговой оправе. Второй – плечистый, рыжеватый, вихрастый молодой человек в заломленной на затылок клетчатой кепке – был в ковбойке, жеваных белых брюках и в черных тапочках.';
 
 function Trainer() {
   const [current, setCurrent] = useState(0);
-  
   const [text, setText] = useState('');
-  useEffect(() => fetchText(), []);
 
-  function handleRestart() {
-    setText('');
-    setCurrent(0);
-    fetchText();
-  }
+  /*
+   * Получение текста через API при первой загрузке
+  */
+  useEffect(() => fetchText(), []);
 
   async function fetchText() {
     try {
@@ -28,10 +26,27 @@ function Trainer() {
       setText(defaultText);
     }
   }
-  
+
+  /*
+   * Функционал кнопки Restart
+  */
+  const btnRestart = useRef(null);
+
+  function handleRestart() {    
+    setText('');
+    setStart(false);
+    setCurrent(0);
+    fetchText();
+    btnRestart.current.blur();
+  }
+
+  /*
+   * Привязка листенера при получении текста и обработка нажатий клавиш
+  */
   useEffect(() => {
     function handleKeyDown(e) {
       if (e.key.length !== 1) return; // проверка, что клавиша "символьная"
+      setStart(true);
       setCurrent(c => {
         if (e.key === text[c]) {
           return c + 1;
@@ -41,24 +56,46 @@ function Trainer() {
         }
       });
     }
-    if (text) {
-      console.log('add listener!');
-      document.addEventListener('keydown', handleKeyDown);
-    }
+    if (text) document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [text]);
 
+  /*
+   * Изменение CSS-классов символов в процессе печати
+  */
   useEffect(() => {
     const currSymbol = document.getElementById(`${current}`);
     if (currSymbol) currSymbol.classList.add('current');
     const prevSymbol = document.getElementById(`${current - 1}`);
     if (prevSymbol) prevSymbol.classList.replace('current', 'complete');
-  });
+  }, [current, text]);
+
+  /*
+   * Мониторинг скорости печати
+  */
+  const [time, setTime] = useState(0);
+  const [speed, setSpeed] = useState(0);
+  const [start, setStart] = useState(false);
+  const intervalRef = useRef('');
+
+  useEffect(() => {
+    if (!start && intervalRef.current) {
+      setTime(0);
+      clearInterval(intervalRef.current);
+    }
+    if (start) {
+      let id = setInterval(() => setTime(t => t + 1), 1000);
+      intervalRef.current = id;
+    }
+  }, [start]);
+
+  useEffect(() => setSpeed(Math.round(current * 60 / time) || 0), [time]);
 
   return (
     <main>
+      <Speed speed={speed} />
       <Text text={text} />
-      <BtnRestart handleRestart={handleRestart} />
+      <BtnRestart ref={btnRestart} handleRestart={handleRestart} />
     </main>
   );
 }
