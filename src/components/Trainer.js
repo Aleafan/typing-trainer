@@ -10,6 +10,7 @@ function Trainer() {
   const [current, setCurrent] = useState(0);
   const [errors, setErrors] = useState(0);
   const [text, setText] = useState('');
+  const [start, setStart] = useState(false);
 
   /*
    * Получение текста через API при первой загрузке
@@ -55,7 +56,6 @@ function Trainer() {
           return c + 1;
         } else {
           setErrors(e => e + 1);
-          document.getElementById(`${c}`).classList.add('error');
           return c;
         }
       });
@@ -67,19 +67,31 @@ function Trainer() {
   /*
    * Изменение CSS-классов символов в процессе печати
   */
+  const main = useRef(null);
+
+  useEffect(() => {
+    let id;
+    if (start) id = setInterval(() => main.current.classList.toggle('cursor-blink'), 600);
+    return () => clearInterval(id);
+  }, [start]);
+
   useEffect(() => {
     const currSymbol = document.getElementById(`${current}`);
     if (currSymbol) currSymbol.classList.add('current');
     const prevSymbol = document.getElementById(`${current - 1}`);
     if (prevSymbol) prevSymbol.classList.replace('current', 'complete');
+    main.current.classList.remove('cursor-blink');
   }, [current, text]);
+
+  useEffect(() => {
+    if (errors) document.getElementById(`${current}`).classList.add('error');
+  }, [errors]);
 
   /*
    * Мониторинг скорости печати
   */
   const [time, setTime] = useState(0);
   const [speed, setSpeed] = useState(0);
-  const [start, setStart] = useState(false);
   const intervalRef = useRef('');
 
   useEffect(() => {
@@ -96,7 +108,7 @@ function Trainer() {
   useEffect(() => setSpeed(Math.round(current * 60 / time) || 0), [time]);
 
   return (
-    <main>
+    <main ref={main}>
       <Speed speed={speed} />
       <Precision current={current} errors={errors} />
       <Text text={text} />
