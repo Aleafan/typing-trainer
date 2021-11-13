@@ -5,14 +5,13 @@ import Speed from './Speed';
 import Precision from './Precision';
 import Result from './Result';
 
-const defaultText = 'Однажды весною, в час небывало жаркого заката, в Москве, на Патриарших прудах, появились два гражданина. Первый из них, одетый в летнюю серенькую пару, был маленького роста, упитан, лыс, свою приличную шляпу пирожком нес в руке, а на хорошо выбритом лице его помещались сверхъестественных размеров очки в черной роговой оправе. Второй – плечистый, рыжеватый, вихрастый молодой человек в заломленной на затылок клетчатой кепке – был в ковбойке, жеваных белых брюках и в черных тапочках.';
+const defaultText = 'We successfully applied the direct quantitative monitoring of resistance genes in meat, which generally might aid as a useful and rapid additional tool for risk assessment. We know that bacteria provide a large pool of resistance genes, which are widely shared between each other. Thus, in terms of resistance gene monitoring, we should sometimes overcome the restricted view on single bacteria and look at the gene pool, instead.';
 
 function Trainer() {
   const [current, setCurrent] = useState(0);
   const [errors, setErrors] = useState(0);
   const [text, setText] = useState('');
   const [start, setStart] = useState(false);
-  const [finish, setFinish] = useState(false);
 
   /*
    * Получение текста через API при первой загрузке
@@ -21,7 +20,7 @@ function Trainer() {
 
   async function fetchText() {
     try {
-      const response = await fetch('https://baconipsum.com/api/?type=meat-and-filler&sentences=1'); // 6!!!!!!!!!!!
+      const response = await fetch('https://baconipsum.com/api/?type=meat-and-filler&sentences=5');
       if (!response.ok) throw new Error('Network response was not OK');
       const [text] = await response.json();
       setText(text);
@@ -30,22 +29,6 @@ function Trainer() {
       console.error(err);
       setText(defaultText);
     }
-  }
-
-  /*
-   * Функционал кнопки Restart
-  */
-  const btnRestart = useRef(null);
-
-  function handleRestart() {    
-    setText('');
-    setStart(false);
-    setFinish(false);
-    setCurrent(0);
-    setErrors(0);
-    setTime(0);
-    fetchText();
-    btnRestart.current.blur();
   }
 
   /*
@@ -58,7 +41,6 @@ function Trainer() {
         if (c === 0) setStart(true);
         if (e.key === text[c]) {
           if (c >= length - 1) {
-            setFinish(true);
             setStart(false);
             setText('');
           }
@@ -99,16 +81,46 @@ function Trainer() {
   /*
    * Мониторинг скорости печати
   */
-  const [time, setTime] = useState(0);
   const [speed, setSpeed] = useState(0);
+  const time = useRef(0);
+  const countSpeed = useRef();
 
   useEffect(() => {
     let id;
-    if (start) id = setInterval(() => setTime(t => t + 1), 1000);
-    return () => clearInterval(id);
+    if (start) id = setInterval(() => countSpeed.current(), 1000);
+    return () => {
+      clearInterval(id);
+      time.current = 0;
+    }
   }, [start]);
+  
+  useEffect(() => {
+    function callback() {
+      time.current += 1;
+      setSpeed(Math.round(current * 60 / time.current) || 0);
+    }
+    countSpeed.current = callback;
+  }, [current]);
 
-  useEffect(() => setSpeed(Math.round(current * 60 / time) || 0), [time]);
+  /*
+   * Функционал кнопки Restart
+  */
+  const btnRestart = useRef(null);
+
+  function handleRestart() {    
+    setText('');
+    setStart(false);
+    setCurrent(0);
+    setErrors(0);
+    setSpeed(0);
+    fetchText();
+    btnRestart.current.blur();
+  }
+
+  /*
+   * Проверка окончания текста для рендеринга результатов
+  */
+  const finish = (!start && current !== 0) ? true : false;
 
   return (
     <main ref={main}>
@@ -117,7 +129,7 @@ function Trainer() {
         <Precision current={current} errors={errors} />
       </div>
       {finish 
-        ? <Result />
+        ? <Result speed={speed} current={current} errors={errors} />
         : <Text text={text} />}
       <BtnRestart ref={btnRestart} handleRestart={handleRestart} />
     </main>
