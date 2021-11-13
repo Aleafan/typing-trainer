@@ -1,8 +1,15 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClock } from '@fortawesome/free-regular-svg-icons';
+
 function Speed(props) {
   return (
-    <p>
-      Скорость: <span>{props.speed}</span> зн./мин.
-    </p>
+    <div className='badge'>
+      <p>
+        <FontAwesomeIcon icon={faClock} />
+        СКОРОСТЬ
+      </p>
+      <p><span>{props.speed}</span> зн/мин</p>      
+    </div>
   );
 }
 
