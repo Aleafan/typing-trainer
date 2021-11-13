@@ -11,7 +11,8 @@ html {
 body {
   height: 100%;
   background: #f9f9f9;
-  font-family: 'Roboto', serif;
+  font-family: 'Press Start 2P', cursive;
+  word-spacing: -0.5rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -23,9 +24,13 @@ body {
 }
 
 header {
-  font-family: 'Press Start 2P', cursive;
   background: #393E46;
   padding: 1.8rem 0;
+}
+@media (max-width: 450px) {
+  header {
+    padding: 1rem 0;
+  }
 }
 
 h1 {
@@ -42,25 +47,44 @@ h1 svg {
   vertical-align: bottom!important;
 }
 
+@media (max-width: 450px) {
+  h1 {
+    font-size: 1.2rem;
+    word-spacing: -0.5rem;
+  }
+  h1 svg {
+    font-size: x-large!important;
+    margin-right: 0.5rem;
+  }
+}
+
 main {
   width: 100%;
   max-width: 700px;
   margin: 0 auto;
+  padding: 0 8px;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .performance {
   display: flex;
   justify-content: space-around;
-  margin: 2rem 0;
+  margin: 1rem 0;
+}
+
+.record .performance {
+  justify-content: center;
+  width: 100%;
+  margin: 0.5rem 0;
 }
 
 .badge {
   width: 210px;
   color: #036f75;
   font-weight: bold;
-  font-family: 'Press Start 2P';
-  word-spacing: -0.5rem;
   text-align: center;
   font-size: 0.8rem;
   border-radius: 20px;
@@ -68,8 +92,21 @@ main {
   padding: 0;
   transition: box-shadow 0.5s ease-in-out;
 }
+@media (max-width: 450px) {
+  .badge {
+    transform: scale(0.9);
+  }
+}
 
-.result .badge {
+.record {
+  margin-top: 0.8rem;
+}
+
+.record .badge {
+  transform: scale(0.8);
+}
+
+.performance.result .badge {
   box-shadow: 0px 0px 6px 4px gold;
 }
 
@@ -78,9 +115,24 @@ main {
   margin-right: 0.5rem;
 }
 
+.record .badge svg {
+  font-size: x-large;
+}
+
 .fa-crosshairs {
   margin-right: 0.35rem!important;
 }
+
+.fa-trophy {
+  color: goldenrod;
+  margin-right: 0.5rem;
+  vertical-align: bottom;
+  font-size: xx-large;
+ }
+
+.record .fa-trophy {
+  color: #036f75;
+ }
 
 .badge span {
   font-size: 1.3rem;
@@ -90,18 +142,23 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
   align-items: center;
   font-size: 1.3rem;
   line-height: 30px;
   border-top: 1px dashed gray;
   border-bottom: 1px dashed gray;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   min-height: 240px;
 }
 
-.text.mes-prepare {
-  font-family: 'Press Start 2P';
-  word-spacing: -0.5rem;
+.text.text-font {
+  font-family: 'Inconsolata', serif;
+  word-spacing: normal;
+}
+
+.text.mes-prepare,
+.text.result {
   text-align: center;
   font-size: 1.1rem;
 }
@@ -110,7 +167,7 @@ main {
   margin: 0.5rem 0;
 }
 
-.text svg {
+.fa-robot {
   font-size: xx-large;
   color: #036f75;
   margin-top: 1rem;
@@ -145,8 +202,6 @@ main {
   width: 210px;
   color: #036f75;
   font-weight: bold;
-  font-family: 'Press Start 2P';
-  word-spacing: -0.5rem;
   text-align: center;
   font-size: 1rem;
   border-radius: 20px;
@@ -158,6 +213,11 @@ main {
   box-shadow: 0 0 8px 5px #026d73;
   background: #d0d0d7;
 }
+@media (max-width: 450px) {
+  .btn-restart {
+    transform: scale(0.9);
+  }
+}
 
 .btn-restart svg {
   margin-right: 0.5rem;
@@ -165,7 +225,6 @@ main {
 }
 
 footer {
-  font-family: 'Press Start 2P', cursive;
   background: #393E46;
   padding: 0.4rem;
   font-size: 0.8rem;
@@ -175,4 +234,27 @@ footer {
 
 footer p {
   margin: 0;
+}
+
+.notification {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #f9f9f9;
+  text-align: center;
+  font-family: 'Press Start 2P';
+  font-size: 0.8rem;
+  word-spacing: -0.5rem;
+}
+
+/* Проверка наличия клавиатуры - если есть мышь или тачпад - то это лэптоп или ПК */
+@media (hover: hover) and (pointer: fine) {
+  .notification {
+    display: none;
+  }
 }
