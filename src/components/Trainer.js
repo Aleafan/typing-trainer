@@ -3,6 +3,7 @@ import Text from './Text';
 import BtnRestart from './BtnRestart';
 import Speed from './Speed';
 import Precision from './Precision';
+import Result from './Result';
 
 const defaultText = 'Однажды весною, в час небывало жаркого заката, в Москве, на Патриарших прудах, появились два гражданина. Первый из них, одетый в летнюю серенькую пару, был маленького роста, упитан, лыс, свою приличную шляпу пирожком нес в руке, а на хорошо выбритом лице его помещались сверхъестественных размеров очки в черной роговой оправе. Второй – плечистый, рыжеватый, вихрастый молодой человек в заломленной на затылок клетчатой кепке – был в ковбойке, жеваных белых брюках и в черных тапочках.';
 
@@ -11,6 +12,7 @@ function Trainer() {
   const [errors, setErrors] = useState(0);
   const [text, setText] = useState('');
   const [start, setStart] = useState(false);
+  const [finish, setFinish] = useState(false);
 
   /*
    * Получение текста через API при первой загрузке
@@ -19,7 +21,7 @@ function Trainer() {
 
   async function fetchText() {
     try {
-      const response = await fetch('https://baconipsum.com/api/?type=meat-and-filler&sentences=7');
+      const response = await fetch('https://baconipsum.com/api/?type=meat-and-filler&sentences=1'); // 6!!!!!!!!!!!
       if (!response.ok) throw new Error('Network response was not OK');
       const [text] = await response.json();
       setText(text);
@@ -38,8 +40,10 @@ function Trainer() {
   function handleRestart() {    
     setText('');
     setStart(false);
+    setFinish(false);
     setCurrent(0);
     setErrors(0);
+    setTime(0);
     fetchText();
     btnRestart.current.blur();
   }
@@ -50,16 +54,21 @@ function Trainer() {
   useEffect(() => {
     function handleKeyDown(e) {
       if (e.key.length !== 1) return; // проверка, что клавиша "символьная"
-      setStart(true);
       setCurrent(c => {
+        if (c === 0) setStart(true);
         if (e.key === text[c]) {
+          if (c >= length - 1) {
+            setFinish(true);
+            setStart(false);
+            setText('');
+          }
           return c + 1;
-        } else {
-          setErrors(e => e + 1);
-          return c;
         }
+        setErrors(e => e + 1);
+        return c;
       });
     }
+    let length = text.length;
     if (text) document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [text]);
@@ -92,26 +101,24 @@ function Trainer() {
   */
   const [time, setTime] = useState(0);
   const [speed, setSpeed] = useState(0);
-  const intervalRef = useRef('');
 
   useEffect(() => {
-    if (!start && intervalRef.current) {
-      setTime(0);
-      clearInterval(intervalRef.current);
-    }
-    if (start) {
-      let id = setInterval(() => setTime(t => t + 1), 1000);
-      intervalRef.current = id;
-    }
+    let id;
+    if (start) id = setInterval(() => setTime(t => t + 1), 1000);
+    return () => clearInterval(id);
   }, [start]);
 
   useEffect(() => setSpeed(Math.round(current * 60 / time) || 0), [time]);
 
   return (
     <main ref={main}>
-      <Speed speed={speed} />
-      <Precision current={current} errors={errors} />
-      <Text text={text} />
+      <div className={finish ? 'performance result' : 'performance'}>
+        <Speed speed={speed} />
+        <Precision current={current} errors={errors} />
+      </div>
+      {finish 
+        ? <Result />
+        : <Text text={text} />}
       <BtnRestart ref={btnRestart} handleRestart={handleRestart} />
     </main>
   );
